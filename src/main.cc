@@ -1,6 +1,8 @@
-#include <iostream>
+#include "Application.hh"
 
 int main()
 {
-    std::cout << "Hi\n";
+    GetApplication()->Initialize();
+    GetApplication()->Poll();
+    GetApplication()->Destroy();
 }
