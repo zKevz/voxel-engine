@@ -105,7 +105,6 @@ int Shader::GetUniformID(std::string_view name)
     if (id == -1)
     {
         LogError("No uniform variable with name: '{}'", name.data());
-        return -1;
     }
 
     return m_UniformCache[name] = id;

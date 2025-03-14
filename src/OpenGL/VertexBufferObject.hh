@@ -39,7 +39,7 @@ public:
     void AddFloat(GLuint count);
     void AddUInteger(GLuint count);
 
-    void AddVertices(T vertex);
+    void AddVertex(T vertex);
     void Build() const;
 
     void Bind() const;

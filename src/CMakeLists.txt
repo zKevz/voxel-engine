@@ -10,9 +10,15 @@ add_executable(${PROJECT_NAME}
     main.cc
 
     Application.cc
+    Block.cc
+    BlockSpecification.cc
+    Chunk.cc
+    World.cc
 
+    OpenGL/Camera3D.cc
     OpenGL/IndexBuffer.cc
     OpenGL/Shader.cc
+    OpenGL/Texture.cc
     OpenGL/VertexArrayObject.cc
     OpenGL/VertexBufferObject.cc
 
@@ -27,5 +33,6 @@ target_link_libraries(${PROJECT_NAME}
     stb
     spdlog::spdlog
     fmt::fmt
+    FastNoiseLite
 )
 target_include_directories(${PROJECT_NAME} PUBLIC .)

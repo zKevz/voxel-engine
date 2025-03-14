@@ -1,6 +1,8 @@
 #include "IndexBuffer.hh"
 
-void IndexBuffer::Initialize(std::initializer_list<GLuint> indices)
+#include <vector>
+
+void IndexBuffer::Initialize(std::vector<GLuint> indices)
 {
     static_assert(sizeof(unsigned int) == sizeof(GLuint));
 
@@ -8,7 +10,7 @@ void IndexBuffer::Initialize(std::initializer_list<GLuint> indices)
 
     glGenBuffers(1, &m_ID);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_Count * sizeof(GLuint), indices.begin(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_Count * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
 }
 
 void IndexBuffer::Bind() const

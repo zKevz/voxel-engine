@@ -27,7 +27,7 @@ void VertexBufferObject<T>::AddUInteger(GLuint count)
 }
 
 template<class T>
-void VertexBufferObject<T>::AddVertices(T vertex)
+void VertexBufferObject<T>::AddVertex(T vertex)
 {
     m_Vertex.emplace_back(std::move(vertex));
 }
