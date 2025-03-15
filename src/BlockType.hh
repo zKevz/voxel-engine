@@ -8,5 +8,5 @@ enum class BlockType : unsigned char
     Dirt,
     Stone,
     Bedrock,
-    Water
+    Sand
 };

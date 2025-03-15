@@ -1,6 +1,6 @@
 #pragma once
 #include "BlockType.hh"
-#include "OpenGL/Vertex.hh"
+#include "OpenGL/VoxelVertex.hh"
 
 #include <glm/glm.hpp>
 
@@ -9,12 +9,12 @@
 struct BlockSpecification
 {
     BlockType Type;
-    glm::uvec2 Positions[(int) VertexDirection::Count];
+    glm::uvec2 Positions[(int) VoxelVertexDirection::Count];
 
     void SetAll(glm::uvec2 position);
-    void SetPosition(VertexDirection direction, glm::uvec2 position);
+    void SetPosition(VoxelVertexDirection direction, glm::uvec2 position);
 
-    inline constexpr glm::uvec2 GetPosition(VertexDirection direction) const
+    inline constexpr glm::uvec2 GetPosition(VoxelVertexDirection direction) const
     {
         return Positions[(int) direction];
     }

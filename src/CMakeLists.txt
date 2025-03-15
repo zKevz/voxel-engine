@@ -1,11 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
 
-find_package(OpenGL REQUIRED)
-find_package(glfw3 REQUIRED)
-find_package(glm REQUIRED)
-find_package(spdlog REQUIRED)
-find_package(fmt REQUIRED)
-
 add_executable(${PROJECT_NAME}
     main.cc
 
@@ -13,6 +7,8 @@ add_executable(${PROJECT_NAME}
     Block.cc
     BlockSpecification.cc
     Chunk.cc
+    Renderer.cc
+    ThreadPool.cc
     World.cc
 
     OpenGL/Camera3D.cc
@@ -34,5 +30,6 @@ target_link_libraries(${PROJECT_NAME}
     spdlog::spdlog
     fmt::fmt
     FastNoiseLite
+    imgui
 )
 target_include_directories(${PROJECT_NAME} PUBLIC .)

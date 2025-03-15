@@ -28,9 +28,15 @@ Camera3D::Camera3D(float posX, float posY, float posZ, float upX, float upY, flo
     UpdateCameraVectors();
 }
 
-void Camera3D::ProcessKeyboard(CameraMovement direction, float deltaTime)
+void Camera3D::ProcessKeyboard(CameraMovement direction, float deltaTime, bool superFast)
 {
     float velocity = m_MovementSpeed * deltaTime;
+    velocity *= 20;
+    if (superFast)
+    {
+        velocity *= 200;
+    }
+
     switch (direction)
     {
         case CameraMovement::Forward:

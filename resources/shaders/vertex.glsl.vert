@@ -29,9 +29,15 @@ void main()
     vec2 textureCoordinates = vec2(tileSize * textureX, 1.0 - tileSize - tileSize * textureY) + uvs[uvType];
     u_TextureCoordinates = textureCoordinates;
 
+    // this is grass, im hardcoding it because im a good programmer
     if (textureX == 0 && textureY == 0) {
         u_TextureColor = vec4(124.0 / 255.0, 189.0 / 255.0, 107.0 / 255.0, 1.0);
     } else {
-        u_TextureColor = vec4(0.0);
+        // back, bottom, right will have slightly darker color?
+        if (direction == 1 || direction == 2 || direction == 3 || direction == 5) {
+            u_TextureColor = vec4(0.7, 0.7, 0.7, 1.0);
+        } else {
+            u_TextureColor = vec4(1.0, 1.0, 1.0, 1.0);
+        }
     }
 }

@@ -1,6 +1,13 @@
 #include "VertexBufferObject.hh"
 
-#include "Vertex.hh"
+#include "Chunk.hh"
+#include "OpenGL/VoxelVertex.hh"
+
+template<class T>
+VertexBufferObject<T>::VertexBufferObject()
+{
+    m_Vertex.reserve(kChunkWidth * kChunkHeight * kChunkDepth * 24);
+}
 
 template<class T>
 void VertexBufferObject<T>::Initialize()
@@ -71,4 +78,4 @@ void VertexBufferObject<T>::Build() const
     Unbind();
 }
 
-template class VertexBufferObject<Vertex>;
+template class VertexBufferObject<VoxelVertex>;

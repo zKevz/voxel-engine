@@ -33,6 +33,8 @@ template<class T>
 class VertexBufferObject
 {
 public:
+    VertexBufferObject();
+
     void Initialize();
 
     void AddByte(GLuint count);

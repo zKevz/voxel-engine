@@ -2,9 +2,7 @@
 #include "OpenGL/Camera3D.hh"
 #include "OpenGL/Shader.hh"
 #include "OpenGL/Texture.hh"
-#include "OpenGL/Vertex.hh"
-#include "OpenGL/VertexArrayObject.hh"
-#include "OpenGL/VertexBufferObject.hh"
+#include "Renderer.hh"
 #include "World.hh"
 
 #include <GLFW/glfw3.h>
@@ -15,13 +13,18 @@ public:
     void Initialize();
     void Destroy();
     void Poll();
+    void Draw();
+    void Update(float deltaTime);
 
 private:
     void InitializeGLFW();
+    void InitializeImGui();
+    void RenderImGui();
     void ProcessInput();
     void MouseCallback(double xposIn, double yposIn);
     void ProcessMouseScroll(double yoffset);
-    void RenderBlock(const Block &block, glm::vec3 position);
+    void KeyCallback(int key, int action);
+
     static void FrameBufferSizeCallback(GLFWwindow *window, int width, int height);
 
     GLFWwindow *m_Window = nullptr;
@@ -30,15 +33,18 @@ private:
     Shader m_Shader;
     Texture m_Texture;
     Camera3D m_Camera3D;
-    IndexBuffer m_IndexBuffer;
-    VertexArrayObject m_VertexArrayObject;
-    VertexBufferObject<Vertex> m_VertexBufferObject;
+    Renderer m_Renderer;
 
     bool m_FirstMouse = true;
+    bool m_OpenImGui = true;
+    bool m_SuperFast = false;
+
     float m_LastX = 0;
     float m_LastY = 0;
     float m_DeltaTime = 0;
     float m_LastFrame = 0;
+    float m_FPS = 0;
+    float m_FPSTimer = 0;
 };
 
 inline Application *GetApplication()

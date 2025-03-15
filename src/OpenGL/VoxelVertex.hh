@@ -2,7 +2,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
-enum class VertexDirection : uint32_t
+enum class VoxelVertexDirection : uint32_t
 {
     Front,
     Back,
@@ -13,7 +13,7 @@ enum class VertexDirection : uint32_t
     Count
 };
 
-enum class VertexUVType : uint32_t
+enum class VoxelVertexUVType : uint32_t
 {
     BottomLeft,
     BottomRight,
@@ -21,12 +21,12 @@ enum class VertexUVType : uint32_t
     TopLeft
 };
 
-struct Vertex
+struct VoxelVertex
 {
     glm::vec3 Position;
     uint32_t Bits = 0;
 
-    Vertex(glm::vec3 position, glm::uvec2 uv, VertexUVType uvType, VertexDirection direction) : Position(position)
+    VoxelVertex(glm::vec3 position, glm::uvec2 uv, VoxelVertexUVType uvType, VoxelVertexDirection direction) : Position(position)
     {
         Bits |= (uint32_t) (uvType);          // Bits 0-1
         Bits |= ((uint32_t) direction) << 2;  // Bits 2-4

@@ -1,17 +1,49 @@
 #pragma once
 #include "Block.hh"
+#include "OpenGL/Camera3D.hh"
+
+#include <FastNoiseLite/FastNoiseLite.h>
 
 #include <array>
 
-static constexpr int kChunkDepth = 32 * 5;
-static constexpr int kChunkWidth = 32 * 5;
-static constexpr int kChunkHeight = 32 * 5;
+static constexpr int kChunkDepth = 16;
+static constexpr int kChunkWidth = 16;
+static constexpr int kChunkHeight = 256;
 
 class Chunk
 {
 public:
-    void Initialize();
+    void Initialize(const FastNoiseLite &noise, glm::ivec2 position);
 
-    glm::vec3 Position;
-    std::array<std::array<std::array<Block, kChunkDepth>, kChunkHeight>, kChunkWidth> Blocks;
+    inline constexpr glm::ivec2 GetPosition() const
+    {
+        return m_Position;
+    }
+
+    inline constexpr const Block &GetBlock(int x, int y, int z) const
+    {
+        return m_Blocks[x][y][z];
+    }
+
+    inline constexpr BlockType GetBlockType(int x, int y, int z) const
+    {
+        return m_Blocks[x][y][z].Type;
+    }
+
+    inline constexpr GLuint GetVertexArrayObjectID() const
+    {
+        return m_VertexArrayObjectID;
+    }
+
+    void SetVertexArrayObjectID(GLuint id)
+    {
+        m_VertexArrayObjectID = id;
+    }
+
+    static BlockType GetBlockTypeAt(int x, int y, int z, const FastNoiseLite &noise);
+
+private:
+    GLuint m_VertexArrayObjectID;
+    glm::ivec2 m_Position;
+    std::array<std::array<std::array<Block, kChunkDepth>, kChunkHeight>, kChunkWidth> m_Blocks;
 };

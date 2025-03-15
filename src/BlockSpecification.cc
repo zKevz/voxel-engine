@@ -2,15 +2,15 @@
 
 void BlockSpecification::SetAll(glm::uvec2 position)
 {
-    SetPosition(VertexDirection::Front, position);
-    SetPosition(VertexDirection::Back, position);
-    SetPosition(VertexDirection::Top, position);
-    SetPosition(VertexDirection::Bottom, position);
-    SetPosition(VertexDirection::Left, position);
-    SetPosition(VertexDirection::Right, position);
+    SetPosition(VoxelVertexDirection::Front, position);
+    SetPosition(VoxelVertexDirection::Back, position);
+    SetPosition(VoxelVertexDirection::Top, position);
+    SetPosition(VoxelVertexDirection::Bottom, position);
+    SetPosition(VoxelVertexDirection::Left, position);
+    SetPosition(VoxelVertexDirection::Right, position);
 }
 
-void BlockSpecification::SetPosition(VertexDirection direction, glm::uvec2 position)
+void BlockSpecification::SetPosition(VoxelVertexDirection direction, glm::uvec2 position)
 {
     Positions[(int) direction] = position;
 }
@@ -30,8 +30,8 @@ void BlockSpecificationManager::Initialize()
     blockSpecification = {};
     blockSpecification.Type = BlockType::Grass;
     blockSpecification.SetAll(glm::uvec2(3, 0));
-    blockSpecification.SetPosition(VertexDirection::Top, glm::uvec2(0, 0));
-    blockSpecification.SetPosition(VertexDirection::Bottom, glm::uvec2(2, 0));
+    blockSpecification.SetPosition(VoxelVertexDirection::Top, glm::uvec2(0, 0));
+    blockSpecification.SetPosition(VoxelVertexDirection::Bottom, glm::uvec2(2, 0));
     AddSpecification(blockSpecification);
 
     blockSpecification = {};
@@ -50,8 +50,8 @@ void BlockSpecificationManager::Initialize()
     AddSpecification(blockSpecification);
 
     blockSpecification = {};
-    blockSpecification.Type = BlockType::Water;
-    blockSpecification.SetAll(glm::uvec2(8, 0));
+    blockSpecification.Type = BlockType::Sand;
+    blockSpecification.SetAll(glm::uvec2(2, 1));
     AddSpecification(blockSpecification);
 }
 
