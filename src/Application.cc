@@ -3,6 +3,7 @@
 #include "BlockSpecification.hh"
 #include "ThreadPool.hh"
 #include "Utils/Logger.hh"
+#include "Utils/Utils.hh"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -10,9 +11,6 @@
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
 #include <imgui/imgui.h>
-
-constexpr const int SCREEN_WIDTH = 1200;
-constexpr const int SCREEN_HEIGHT = 800;
 
 void Application::KeyCallback(int key, int action)
 {
@@ -22,16 +20,16 @@ void Application::KeyCallback(int key, int action)
         {
             case GLFW_KEY_ESCAPE:
             {
-                int mode = glfwGetInputMode(m_Window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL;
-                glfwSetInputMode(m_Window, GLFW_CURSOR, mode);
+                int mode = glfwGetInputMode(m_Window, GLFW_CURSOR);
+                m_FirstMouse = mode == GLFW_CURSOR_NORMAL;
+                glfwSetInputMode(m_Window, GLFW_CURSOR, mode == GLFW_CURSOR_NORMAL ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
                 break;
             }
 
             case GLFW_KEY_R:
             {
-                int mode;
-                glGetIntegerv(GL_POLYGON_MODE, &mode);
-                glPolygonMode(GL_FRONT_AND_BACK, mode == GL_FILL ? GL_LINE : GL_FILL);
+                m_RenderWireframe = !m_RenderWireframe;
+                glPolygonMode(GL_FRONT_AND_BACK, m_RenderWireframe ? GL_LINE : GL_FILL);
                 break;
             }
 
@@ -86,7 +84,46 @@ void Application::MouseCallback(double xposIn, double yposIn)
 
 void Application::ProcessMouseScroll(double yoffset)
 {
+    if (glfwGetInputMode(m_Window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL)
+    {
+        return;
+    }
+
     m_Camera3D.ProcessMouseScroll(static_cast<float>(yoffset));
+}
+
+void Application::MouseButtonCallback(int button, int action)
+{
+    if (glfwGetInputMode(m_Window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL)
+    {
+        return;
+    }
+
+    if (action == GLFW_PRESS)
+    {
+        switch (button)
+        {
+            case GLFW_MOUSE_BUTTON_LEFT:
+            {
+                RaycastBlockResult raycastBlockResult = Utils::RaycastBlock(m_Camera3D.GetPosition(), m_Camera3D.GetFront(), m_World);
+                if (raycastBlockResult.Hit)
+                {
+                    m_World.DestroyBlock(raycastBlockResult.BlockPosition);
+                }
+                break;
+            }
+
+            case GLFW_MOUSE_BUTTON_RIGHT:
+            {
+                RaycastBlockResult raycastBlockResult = Utils::RaycastBlock(m_Camera3D.GetPosition(), m_Camera3D.GetFront(), m_World);
+                if (raycastBlockResult.Hit)
+                {
+                    m_World.AddBlock(raycastBlockResult.BlockPosition + raycastBlockResult.FaceNormal, m_BlockTypeChosen);
+                }
+                break;
+            }
+        }
+    }
 }
 
 void Application::InitializeGLFW()
@@ -123,6 +160,10 @@ void Application::InitializeGLFW()
     glfwSetKeyCallback(m_Window, [](GLFWwindow *window, int key, int scancode, int action, int mods) {
         GetApplication()->KeyCallback(key, action);
     });
+
+    glfwSetMouseButtonCallback(m_Window, [](GLFWwindow *window, int button, int action, int mods) {
+        GetApplication()->MouseButtonCallback(button, action);
+    });
 }
 
 void Application::InitializeImGui()
@@ -154,23 +195,19 @@ void Application::Initialize()
     GetThreadPool()->Initialize();
     GetBlockSpecificationManager()->Initialize();
 
-    m_Shader.Initialize("resources/shaders/vertex.glsl.vert", "resources/shaders/fragment.glsl.frag");
-    m_Texture.Initialize("resources/textures/terrain.png");
+    m_Renderer.Initialize();
     m_Camera3D = Camera3D(glm::vec3(kChunkWidth / 2.0, kChunkHeight / 2.0 + 10.0f, kChunkDepth / 2.0));
 
     m_World.SetRenderer(&m_Renderer);
     m_World.Initialize(glm::ivec2(m_Camera3D.GetPosition().x, m_Camera3D.GetPosition().z));
 
     glEnable(GL_BLEND);
-    // glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
-
-    // glCullFace(GL_BACK);
-    // glFrontFace(GL_CW);
-
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CW);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDepthFunc(GL_LESS);
-
     glfwSwapInterval(1);
 }
 
@@ -178,12 +215,7 @@ void Application::Destroy()
 {
     GetThreadPool()->Destroy();
 
-    m_Shader.Destroy();
-
-    for (auto &&vertexArrayObject : m_Renderer.GetVertexArrayObjects())
-    {
-        vertexArrayObject.Destroy();
-    }
+    m_Renderer.Destroy();
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
@@ -192,29 +224,14 @@ void Application::Destroy()
     glfwTerminate();
 }
 
-void Application::Draw()
+void Application::Render()
 {
     // blue sky
     glClearColor(190 / 255.0f, 244 / 255.0f, 255 / 255.0f, 1.0f);
     // glClearColor(0.0f, 0.0f, 0.0f, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glm::mat4 proj = glm::perspective(glm::radians(m_Camera3D.GetZoom()), (float) SCREEN_WIDTH / (float) SCREEN_HEIGHT, 0.1f, 1000.0f);
-    glm::mat4 view = m_Camera3D.GetViewMatrix();
-    static glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-
-    glm::mat4 mvp = proj * view * model;
-
-    m_Texture.Bind();
-    m_Shader.Bind();
-    m_Shader.SetUniform("u_Mvp", mvp);
-    m_Shader.SetUniform("u_Texture", 0);
-
-    for (const VertexArrayObject<VoxelVertex> &vertexArrayObject : m_Renderer.GetVertexArrayObjects())
-    {
-        vertexArrayObject.Bind();
-        glDrawElements(GL_TRIANGLES, vertexArrayObject.GetIndicesCount(), GL_UNSIGNED_INT, 0);
-    }
+    m_Renderer.Render(m_World, m_Camera3D);
 
     RenderImGui();
 }
@@ -244,7 +261,7 @@ void Application::Poll()
     {
         Update(glfwGetTime());
         ProcessInput();
-        Draw();
+        Render();
         glfwSwapBuffers(m_Window);
         glfwPollEvents();
     }
@@ -269,6 +286,18 @@ void Application::RenderImGui()
     ImGui::Text("Press 'M' to toggle imgui");
     ImGui::Text("Press 'F' to toggle super fast");
     ImGui::Text("Position: %.3f %.3f %.3f", m_Camera3D.GetPosition().x, m_Camera3D.GetPosition().y, m_Camera3D.GetPosition().z);
+
+    // i love unsafe-ness
+    if (ImGui::Combo("Block chosen", (int *) &m_BlockTypeChosen, BlockTypeToStringSeparatedByZeros()))
+    {
+        if (m_BlockTypeChosen == BlockType::Air)
+        {
+            m_BlockTypeChosen = BlockType::Grass;
+        }
+    }
+
+    RaycastBlockResult raycastBlockResult = Utils::RaycastBlock(m_Camera3D.GetPosition(), m_Camera3D.GetFront(), m_World);
+    ImGui::Text("Raycast: %d %d %d", raycastBlockResult.BlockPosition.x, raycastBlockResult.BlockPosition.y, raycastBlockResult.BlockPosition.z);
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / m_FPS, m_FPS);
     ImGui::Text("Chunk size: %zu", m_World.GetChunks().size());
     ImGui::InputInt("Render Distance", m_World.GetRenderDistancePointer());
@@ -295,6 +324,11 @@ void Application::RenderImGui()
 
 void Application::ProcessInput()
 {
+    if (glfwGetInputMode(m_Window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL)
+    {
+        return;
+    }
+
     if (glfwGetKey(m_Window, GLFW_KEY_W) == GLFW_PRESS)
     {
         m_Camera3D.ProcessKeyboard(CameraMovement::Forward, m_DeltaTime, m_SuperFast);

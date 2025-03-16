@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 // i love 255 blocks limit <3
 enum class BlockType : unsigned char
 {
@@ -10,3 +12,20 @@ enum class BlockType : unsigned char
     Bedrock,
     Sand
 };
+
+constexpr std::array<const char *, 6> kBlocksEnumName = { "Air", "Grass", "Dirt", "Stone", "Bedrock", "Sand" };
+
+static inline const char *BlockTypeToStringSeparatedByZeros()
+{
+    static std::string result;
+    if (result.empty())
+    {
+        for (const auto &block : kBlocksEnumName)
+        {
+            result.append(block);
+            result.push_back('\0');
+        }
+    }
+
+    return result.data();
+}

@@ -47,6 +47,11 @@ public:
         return m_Position;
     }
 
+    inline constexpr glm::vec3 GetFront() const
+    {
+        return m_Front;
+    }
+
     void SetPosition(float x, float y, float z)
     {
         m_Position = glm::vec3(x, y, z);

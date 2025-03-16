@@ -7,7 +7,7 @@
 #include <queue>
 #include <set>
 
-static constexpr int kDefaultRenderDistance = 16;
+static constexpr int kDefaultRenderDistance = 18;
 
 using Chunks = std::map<std::pair<int, int>, Chunk>;
 
@@ -22,11 +22,17 @@ public:
     void Initialize(glm::ivec2 genesis = glm::ivec2(0, 0));
     void RemoveFuture(glm::ivec2 position);
 
-    const Chunk *GetChunk(glm::ivec3 position);
-    const Chunk *GetChunk(int x, int y, int z);
+    void AddBlock(glm::ivec3 position, BlockType type);
+    void DestroyBlock(glm::ivec3 position);
 
-    BlockType GetBlockTypeAt(glm::ivec3 position);
-    BlockType GetBlockTypeAt(int x, int y, int z);
+    Chunk *GetChunk(glm::ivec3 position);
+    Chunk *GetChunk(int x, int y, int z);
+
+    Block &GetBlock(glm::ivec3 position);
+    Block &GetBlock(int x, int y, int z);
+
+    BlockType GetBlockType(glm::ivec3 position);
+    BlockType GetBlockType(int x, int y, int z);
 
     inline constexpr const std::map<std::pair<int, int>, Chunk> &GetChunks() const
     {
@@ -36,6 +42,11 @@ public:
     inline constexpr int GetRenderDistance() const
     {
         return m_RenderDistance;
+    }
+
+    inline constexpr const FastNoiseLite &GetNoise() const
+    {
+        return m_Noise;
     }
 
     inline constexpr int *GetRenderDistancePointer()

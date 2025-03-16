@@ -110,7 +110,56 @@ void World::RemoveFuture(glm::ivec2 position)
     m_QueuedChunks.erase(key);
 }
 
-const Chunk *World::GetChunk(glm::ivec3 position)
+void World::AddBlock(glm::ivec3 position, BlockType type)
+{
+    int chunkX = Utils::FloorDiv(position.x, kChunkWidth) * kChunkWidth;
+    int chunkZ = Utils::FloorDiv(position.z, kChunkDepth) * kChunkDepth;
+
+    auto key = std::make_pair(chunkX, chunkZ);
+    Block &block = GetBlock(position);
+    block.Type = type;
+
+    m_Renderer->ReRenderChunk(*this, m_Chunks[key], m_Noise);
+}
+
+void World::DestroyBlock(glm::ivec3 position)
+{
+    int chunkX = Utils::FloorDiv(position.x, kChunkWidth) * kChunkWidth;
+    int chunkZ = Utils::FloorDiv(position.z, kChunkDepth) * kChunkDepth;
+
+    auto key = std::make_pair(chunkX, chunkZ);
+    Block &block = GetBlock(position);
+    block.Type = BlockType::Air;
+
+    m_Renderer->ReRenderChunk(*this, m_Chunks[key], m_Noise);
+
+    // in the edge? also need to re-render chunk besides it
+    if (position.x == chunkX)
+    {
+        key.first -= kChunkWidth;
+        m_Renderer->ReRenderChunk(*this, m_Chunks[key], m_Noise);
+        key.first += kChunkWidth;
+    }
+    else if (position.x == chunkX + kChunkWidth - 1)
+    {
+        key.first += kChunkWidth;
+        m_Renderer->ReRenderChunk(*this, m_Chunks[key], m_Noise);
+        key.first -= kChunkWidth;
+    }
+
+    if (position.z == chunkZ)
+    {
+        key.second -= kChunkDepth;
+        m_Renderer->ReRenderChunk(*this, m_Chunks[key], m_Noise);
+    }
+    else if (position.z == chunkZ + kChunkDepth - 1)
+    {
+        key.second += kChunkDepth;
+        m_Renderer->ReRenderChunk(*this, m_Chunks[key], m_Noise);
+    }
+}
+
+Chunk *World::GetChunk(glm::ivec3 position)
 {
     int chunkX = Utils::FloorDiv(position.x, kChunkWidth) * kChunkWidth;
     int chunkZ = Utils::FloorDiv(position.z, kChunkDepth) * kChunkDepth;
@@ -125,16 +174,43 @@ const Chunk *World::GetChunk(glm::ivec3 position)
     return nullptr;
 }
 
-const Chunk *World::GetChunk(int x, int y, int z)
+Chunk *World::GetChunk(int x, int y, int z)
 {
     return GetChunk(glm::ivec3(x, y, z));
 }
 
-BlockType World::GetBlockTypeAt(glm::ivec3 position)
+Block &World::GetBlock(glm::ivec3 position)
 {
-    const Chunk *chunk = GetChunk(position);
+    Chunk *chunk = GetChunk(position);
+
+    int localX = position.x % kChunkWidth;
+    int localY = position.y;
+    int localZ = position.z % kChunkDepth;
+
+    if (localX < 0)
+    {
+        localX += kChunkWidth;
+    }
+
+    if (localZ < 0)
+    {
+        localZ += kChunkDepth;
+    }
+
+    return chunk->GetBlock(localX, localY, localZ);
+}
+
+Block &World::GetBlock(int x, int y, int z)
+{
+    return GetBlock(glm::ivec3(x, y, z));
+}
+
+BlockType World::GetBlockType(glm::ivec3 position)
+{
+    Chunk *chunk = GetChunk(position);
     if (chunk == nullptr)
     {
+        LogDebug("chunk at {} {} is nullptr", position.x, position.z);
         return Chunk::GetBlockTypeAt(position.x, position.y, position.z, m_Noise);
     }
 
@@ -152,16 +228,10 @@ BlockType World::GetBlockTypeAt(glm::ivec3 position)
         localZ += kChunkDepth;
     }
 
-    if (localX < 0 || localY < 0 || localZ < 0 || localX >= kChunkWidth || localY >= kChunkHeight || localZ >= kChunkDepth)
-    {
-        LogInfo("what..");
-        return BlockType::Air;
-    }
-
-    return chunk->GetBlockType(localX, localY, localZ);
+    return chunk->GetBlock(localX, localY, localZ).Type;
 }
 
-BlockType World::GetBlockTypeAt(int x, int y, int z)
+BlockType World::GetBlockType(int x, int y, int z)
 {
-    return GetBlockTypeAt(glm::ivec3(x, y, z));
+    return GetBlockType(glm::ivec3(x, y, z));
 }

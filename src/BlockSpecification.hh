@@ -1,6 +1,6 @@
 #pragma once
 #include "BlockType.hh"
-#include "OpenGL/VoxelVertex.hh"
+#include "Vertex/VoxelVertex.hh"
 
 #include <glm/glm.hpp>
 

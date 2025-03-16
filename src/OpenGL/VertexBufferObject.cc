@@ -1,12 +1,13 @@
 #include "VertexBufferObject.hh"
 
 #include "Chunk.hh"
-#include "OpenGL/VoxelVertex.hh"
+#include "Vertex/CrossHairVertex.hh"
+#include "Vertex/VoxelVertex.hh"
 
 template<class T>
 VertexBufferObject<T>::VertexBufferObject()
 {
-    m_Vertex.reserve(kChunkWidth * kChunkHeight * kChunkDepth * 24);
+    m_Vertex.reserve(kChunkWidth * kChunkHeight * kChunkDepth * 24 * sizeof(T));
 }
 
 template<class T>
@@ -61,7 +62,7 @@ template<class T>
 void VertexBufferObject<T>::Build() const
 {
     Bind();
-    glBufferData(GL_ARRAY_BUFFER, m_Vertex.size() * sizeof(T), m_Vertex.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m_Vertex.size() * sizeof(T), m_Vertex.data(), GL_DYNAMIC_DRAW);
 
     GLuint offset = 0;
 
@@ -78,4 +79,19 @@ void VertexBufferObject<T>::Build() const
     Unbind();
 }
 
+template<class T>
+void VertexBufferObject<T>::Replace() const
+{
+    Bind();
+    glBufferSubData(GL_ARRAY_BUFFER, 0, m_Vertex.size() * sizeof(T), m_Vertex.data());
+    Unbind();
+}
+
+template<class T>
+void VertexBufferObject<T>::ClearVertex()
+{
+    m_Vertex.clear();
+}
+
 template class VertexBufferObject<VoxelVertex>;
+template class VertexBufferObject<CrossHairVertex>;

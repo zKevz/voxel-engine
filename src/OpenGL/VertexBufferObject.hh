@@ -35,6 +35,7 @@ class VertexBufferObject
 public:
     VertexBufferObject();
 
+    void ClearVertex();
     void Initialize();
 
     void AddByte(GLuint count);
@@ -43,6 +44,7 @@ public:
 
     void AddVertex(T vertex);
     void Build() const;
+    void Replace() const;
 
     void Bind() const;
     void Unbind() const;

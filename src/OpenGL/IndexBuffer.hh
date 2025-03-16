@@ -6,6 +6,8 @@
 class IndexBuffer
 {
 public:
+    void Set(std::vector<GLuint> indices);
+    void Replace(std::vector<GLuint> indices);
     void Initialize(std::vector<GLuint> indices);
 
     void Bind() const;

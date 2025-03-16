@@ -1,7 +1,5 @@
 #pragma once
 #include "OpenGL/Camera3D.hh"
-#include "OpenGL/Shader.hh"
-#include "OpenGL/Texture.hh"
 #include "Renderer.hh"
 #include "World.hh"
 
@@ -13,7 +11,7 @@ public:
     void Initialize();
     void Destroy();
     void Poll();
-    void Draw();
+    void Render();
     void Update(float deltaTime);
 
 private:
@@ -22,6 +20,7 @@ private:
     void RenderImGui();
     void ProcessInput();
     void MouseCallback(double xposIn, double yposIn);
+    void MouseButtonCallback(int button, int action);
     void ProcessMouseScroll(double yoffset);
     void KeyCallback(int key, int action);
 
@@ -30,14 +29,15 @@ private:
     GLFWwindow *m_Window = nullptr;
 
     World m_World;
-    Shader m_Shader;
-    Texture m_Texture;
+    BlockType m_BlockTypeChosen = BlockType::Grass;
+
     Camera3D m_Camera3D;
     Renderer m_Renderer;
 
     bool m_FirstMouse = true;
     bool m_OpenImGui = true;
     bool m_SuperFast = false;
+    bool m_RenderWireframe = false;
 
     float m_LastX = 0;
     float m_LastY = 0;

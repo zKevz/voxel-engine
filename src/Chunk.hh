@@ -20,7 +20,7 @@ public:
         return m_Position;
     }
 
-    inline constexpr const Block &GetBlock(int x, int y, int z) const
+    inline constexpr Block &GetBlock(int x, int y, int z)
     {
         return m_Blocks[x][y][z];
     }
