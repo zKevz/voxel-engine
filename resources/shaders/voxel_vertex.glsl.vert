@@ -65,9 +65,9 @@ void main()
 
     if (textureX == 13u && textureY == 12u)
     {
-        float crazyFactor = 0.1; // Amplitude
-        float freq = 2.0; // Frequency
-        float timeSpeed = u_Time * 2.0; // Time Speedup
+        float crazyFactor = 0.2;
+        float freq = 1.0;
+        float timeSpeed = u_Time * 1.0;
 
         gl_Position.y += sin(gl_Position.x * freq + timeSpeed) * crazyFactor;
         gl_Position.y += cos(gl_Position.z * freq + timeSpeed) * crazyFactor;

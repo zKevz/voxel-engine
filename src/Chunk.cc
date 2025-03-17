@@ -29,11 +29,11 @@ static inline constexpr float Lerp(float a, float b, float t)
 }
 
 static inline std::vector<std::pair<float, float>> ContinentalnessCurve = {
-    { -1.0f, -60.0f },  // deep ocean
-    { -0.9f, -50.0f },  // deep ocean
-    { -0.7f, -40.0f },  // deep ocean
-    { -0.5f, -30.0f },  // warm ocean
-    { -0.3f, -20.0f },  // plain
+    { -1.0f, -50.0f },  // deep ocean
+    { -0.9f, -40.0f },  // deep ocean
+    { -0.7f, -30.0f },  // deep ocean
+    { -0.5f, -20.0f },  // warm ocean
+    { -0.2f, -10.0f },  // plain
     { 0.0f, -5.0f },    // plain
     { 0.1f, 0.0f },     // plain
     { 0.3f, 40.0f },    // hills
@@ -80,17 +80,35 @@ BlockType Chunk::GetBlockTypeAt(int x, int y, int z, const FastNoiseLite &noise)
 {
     float continentalness = noise.GetNoise((float) x, (float) z);
     int height = kBaseHeight + MapContinentalness(continentalness);
+
     if (y < height)
     {
-        if (y >= kMountainSnowHeightMin)
+        if (continentalness >= 0.4f)
         {
+            // LogInfo("snow:{}", continentalness);
             return BlockType::Snow;
         }
 
-        if (y >= kMountainHeightMin)
+        if (continentalness >= 0.25f)
         {
+            // LogInfo("ston:{}", continentalness);
             return BlockType::Stone;
         }
+
+        if (continentalness <= -0.1f)
+        {
+            return BlockType::Sand;
+        }
+
+        // if (y >= kMountainSnowHeightMin)
+        // {
+        //     return BlockType::Snow;
+        // }
+
+        // if (y >= kMountainHeightMin)
+        // {
+        //     return BlockType::Stone;
+        // }
 
         if (y == height - 1)
         {

@@ -345,7 +345,7 @@ void Renderer::Render(World &world, const Camera3D &camera)
 
 void Renderer::RenderWorld(World &world, const Camera3D &camera)
 {
-    glm::mat4 proj = glm::perspective(glm::radians(camera.GetZoom()), (float) SCREEN_WIDTH / (float) SCREEN_HEIGHT, 0.1f, 1000.0f);
+    glm::mat4 proj = glm::perspective(glm::radians(camera.GetZoom()), (float) SCREEN_WIDTH / (float) SCREEN_HEIGHT, 0.1f, 10000.0f);
     glm::mat4 view = camera.GetViewMatrix();
     static glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
 
@@ -522,7 +522,7 @@ void Renderer::RenderSkyBox(const Camera3D &camera)
     glCullFace(GL_FRONT);
     glDepthFunc(GL_LEQUAL);
 
-    glm::mat4 proj = glm::perspective(glm::radians(camera.GetZoom()), (float) SCREEN_WIDTH / (float) SCREEN_HEIGHT, 0.1f, 1000.0f);
+    glm::mat4 proj = glm::perspective(glm::radians(camera.GetZoom()), (float) SCREEN_WIDTH / (float) SCREEN_HEIGHT, 0.1f, 10000.0f);
     glm::mat4 view = glm::mat4(glm::mat3(camera.GetViewMatrix()));  // remove translation from the view matrix
 
     m_SkyBoxTexture.Bind(1);

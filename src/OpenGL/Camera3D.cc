@@ -7,6 +7,7 @@ Camera3D::Camera3D(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
     m_Pitch = pitch;
     m_Front = glm::vec3(0.0f, 0.0f, -1.0f);
     m_WorldUp = up;
+    m_Velocity = glm::vec3(0.0f, 0.0f, 0.0f);
     m_Position = position;
     m_MovementSpeed = kDefaultSpeed;
     m_MouseSensitivity = kDefaultSensitivity;
@@ -28,52 +29,107 @@ Camera3D::Camera3D(float posX, float posY, float posZ, float upX, float upY, flo
     UpdateCameraVectors();
 }
 
-void Camera3D::ProcessKeyboard(CameraMovement direction, float deltaTime, bool superFast)
+void Camera3D::Update(GLFWwindow *window, float deltaTime)
 {
-    float velocity = m_MovementSpeed * deltaTime;
-    if (superFast)
+    m_Velocity = {};
+
+    if (glfwGetInputMode(window, GLFW_CURSOR) != GLFW_CURSOR_NORMAL)
     {
-        velocity *= 20;
+        CameraMovement direction = CameraMovement::None;
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        {
+            direction = CameraMovement::Forward;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        {
+            direction = CameraMovement::Backward;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        {
+            direction = CameraMovement::Left;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        {
+            direction = CameraMovement::Right;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        {
+            direction = CameraMovement::Up;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        {
+            direction = CameraMovement::Down;
+        }
+
+        switch (direction)
+        {
+            case CameraMovement::Forward:
+            {
+                m_Velocity.x = m_Front.x;
+                m_Velocity.z = m_Front.z;
+                break;
+            }
+
+            case CameraMovement::Backward:
+            {
+                m_Velocity.x = -m_Front.x;
+                m_Velocity.z = -m_Front.z;
+                break;
+            }
+
+            case CameraMovement::Left:
+            {
+                m_Velocity.x = -m_Right.x;
+                m_Velocity.z = -m_Right.z;
+                break;
+            }
+
+            case CameraMovement::Right:
+            {
+                m_Velocity.x = m_Right.x;
+                m_Velocity.z = m_Right.z;
+                break;
+            }
+
+            case CameraMovement::Up:
+            {
+                m_Velocity.y = 1.0f;
+                break;
+            }
+
+            case CameraMovement::Down:
+            {
+                m_Velocity.y = -1.0f;
+                break;
+            }
+
+            default:
+            {
+                break;
+            }
+        }
+
+        if (m_SuperFast)
+        {
+            m_MovementSpeed = kDefaultSpeed * 10.0f;
+        }
+        else
+        {
+            m_MovementSpeed = kDefaultSpeed;
+        }
     }
 
-    switch (direction)
+    if (m_EnablePhysics)
     {
-        case CameraMovement::Forward:
-        {
-            m_Position += m_Front * velocity;
-            break;
-        }
-
-        case CameraMovement::Backward:
-        {
-            m_Position -= m_Front * velocity;
-            break;
-        }
-
-        case CameraMovement::Left:
-        {
-            m_Position -= m_Right * velocity;
-            break;
-        }
-
-        case CameraMovement::Right:
-        {
-            m_Position += m_Right * velocity;
-            break;
-        }
-
-        case CameraMovement::Up:
-        {
-            m_Position.y += velocity * 2;
-            break;
-        }
-
-        case CameraMovement::Down:
-        {
-            m_Position.y -= velocity;
-            break;
-        }
+        m_Velocity.y -= kGravity;
     }
+
+    m_Position += m_Velocity * m_MovementSpeed * deltaTime;
 }
 
 void Camera3D::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch)

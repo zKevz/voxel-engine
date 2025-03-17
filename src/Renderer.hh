@@ -84,7 +84,7 @@ private:
         VertexBufferObject<VoxelVertex> WaterVertexBufferObject;
     };
 
-    float m_Ambient = 0.3f;
+    float m_Ambient = 0.7f;
     glm::vec3 m_LightSourceDirection = glm::vec3(-1.0, 1.0, 1.0);
 
     Shader m_VoxelShader;

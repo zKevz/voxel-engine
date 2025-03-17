@@ -12,13 +12,12 @@ public:
     void Destroy();
     void Poll();
     void Render();
-    void Update(float deltaTime);
+    void Update(float time);
 
 private:
     void InitializeGLFW();
     void InitializeImGui();
     void RenderImGui();
-    void ProcessInput();
     void MouseCallback(double xposIn, double yposIn);
     void MouseButtonCallback(int button, int action);
     void ProcessMouseScroll(double yoffset);
@@ -34,9 +33,10 @@ private:
     Camera3D m_Camera3D;
     Renderer m_Renderer;
 
-    bool m_FirstMouse = true;
+    int m_RenderDistance = kDefaultRenderDistance;
+
     bool m_OpenImGui = true;
-    bool m_SuperFast = false;
+    bool m_FirstMouse = true;
     bool m_RenderWireframe = false;
 
     float m_LastX = 0;

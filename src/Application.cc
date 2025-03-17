@@ -41,7 +41,7 @@ void Application::KeyCallback(int key, int action)
 
             case GLFW_KEY_F:
             {
-                m_SuperFast = !m_SuperFast;
+                m_Camera3D.ToggleSuperFast();
                 break;
             }
         }
@@ -198,6 +198,7 @@ void Application::Initialize()
     glFrontFace(GL_CW);
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
     glfwSwapInterval(1);
 }
@@ -224,12 +225,12 @@ void Application::Render()
     RenderImGui();
 }
 
-void Application::Update(float deltaTime)
+void Application::Update(float time)
 {
     float fpsUpdateInterval = 0.5f;
 
-    m_DeltaTime = deltaTime - m_LastFrame;
-    m_LastFrame = deltaTime;
+    m_DeltaTime = time - m_LastFrame;
+    m_LastFrame = time;
 
     m_FPSTimer += m_DeltaTime;
 
@@ -238,6 +239,8 @@ void Application::Update(float deltaTime)
         m_FPS = 1.0f / m_DeltaTime;
         m_FPSTimer = 0.0f;
     }
+
+    m_Camera3D.Update(m_Window, m_DeltaTime);
 
     m_World.Initialize(glm::ivec2(m_Camera3D.GetPosition().x, m_Camera3D.GetPosition().z));
     m_Renderer.PollQueue(m_World);
@@ -248,7 +251,6 @@ void Application::Poll()
     while (!glfwWindowShouldClose(m_Window))
     {
         Update(glfwGetTime());
-        ProcessInput();
         Render();
         glfwSwapBuffers(m_Window);
         glfwPollEvents();
@@ -275,6 +277,12 @@ void Application::RenderImGui()
     ImGui::Text("Press 'F' to toggle super fast");
     ImGui::Text("Position: %.3f %.3f %.3f", m_Camera3D.GetPosition().x, m_Camera3D.GetPosition().y, m_Camera3D.GetPosition().z);
 
+    RaycastBlockResult raycastBlockResult = Utils::RaycastBlock(m_Camera3D.GetPosition(), m_Camera3D.GetFront(), m_World);
+    ImGui::Text("Raycast: %d %d %d", raycastBlockResult.BlockPosition.x, raycastBlockResult.BlockPosition.y, raycastBlockResult.BlockPosition.z);
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    ImGui::Text("Chunk size: %zu", m_World.GetChunks().size());
+    ImGui::Separator();
+
     static const char *skyTypes[] = { "blue", "brown", "gray", "yellow", "cool" };
     static int skyTypeIndex = 4;  // default cool because i like it the most
 
@@ -299,16 +307,24 @@ void Application::RenderImGui()
         }
     }
 
-    RaycastBlockResult raycastBlockResult = Utils::RaycastBlock(m_Camera3D.GetPosition(), m_Camera3D.GetFront(), m_World);
-    ImGui::Text("Raycast: %d %d %d", raycastBlockResult.BlockPosition.x, raycastBlockResult.BlockPosition.y, raycastBlockResult.BlockPosition.z);
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / m_FPS, m_FPS);
-    ImGui::Text("Chunk size: %zu", m_World.GetChunks().size());
-    ImGui::InputInt("Render Distance", m_World.GetRenderDistancePointer());
+    ImGui::Separator();
+
+    ImGui::InputInt("Render Distance", &m_RenderDistance);
+    if (ImGui::Button("Apply"))
+    {
+        m_World.SetRenderDistance(m_RenderDistance);
+    }
+
+    ImGui::Separator();
     ImGui::InputFloat("Ambient", m_Renderer.GetAmbientPointer());
     ImGui::InputFloat3("Light Source Direction", (float *) m_Renderer.GetLightSourceDirectionPointer());
-    ImGui::Checkbox("Go very fast", &m_SuperFast);
-    ImGui::InputFloat3("Teleport", positions);
+    ImGui::Separator();
 
+    ImGui::Checkbox("Go very fast", m_Camera3D.GetSuperFastPointer());
+    ImGui::Checkbox("Enable physics", m_Camera3D.GetPhysicsEnabledPointer());
+    ImGui::Separator();
+
+    ImGui::InputFloat3("Teleport", positions);
     if (ImGui::Button("Teleport"))
     {
         m_Camera3D.SetPosition(positions[0], positions[1], positions[2]);
@@ -321,46 +337,9 @@ void Application::RenderImGui()
         m_Camera3D.SetPosition(position.x, position.y, position.z);
     }
 
+    ImGui::Separator();
     ImGui::End();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
-
-void Application::ProcessInput()
-{
-    if (glfwGetInputMode(m_Window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL)
-    {
-        return;
-    }
-
-    if (glfwGetKey(m_Window, GLFW_KEY_W) == GLFW_PRESS)
-    {
-        m_Camera3D.ProcessKeyboard(CameraMovement::Forward, m_DeltaTime, m_SuperFast);
-    }
-
-    if (glfwGetKey(m_Window, GLFW_KEY_S) == GLFW_PRESS)
-    {
-        m_Camera3D.ProcessKeyboard(CameraMovement::Backward, m_DeltaTime, m_SuperFast);
-    }
-
-    if (glfwGetKey(m_Window, GLFW_KEY_A) == GLFW_PRESS)
-    {
-        m_Camera3D.ProcessKeyboard(CameraMovement::Left, m_DeltaTime, m_SuperFast);
-    }
-
-    if (glfwGetKey(m_Window, GLFW_KEY_D) == GLFW_PRESS)
-    {
-        m_Camera3D.ProcessKeyboard(CameraMovement::Right, m_DeltaTime, m_SuperFast);
-    }
-
-    if (glfwGetKey(m_Window, GLFW_KEY_SPACE) == GLFW_PRESS)
-    {
-        m_Camera3D.ProcessKeyboard(CameraMovement::Up, m_DeltaTime, m_SuperFast);
-    }
-
-    if (glfwGetKey(m_Window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-    {
-        m_Camera3D.ProcessKeyboard(CameraMovement::Down, m_DeltaTime, m_SuperFast);
-    }
 }
