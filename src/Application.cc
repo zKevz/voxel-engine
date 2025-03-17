@@ -41,11 +41,7 @@ void Application::KeyCallback(int key, int action)
 
             case GLFW_KEY_F:
             {
-                auto position = m_Camera3D.GetPosition();
-                position.z += 1e2;
-                m_Camera3D.SetPosition(position.x, position.y, position.z);
-
-                // m_SuperFast = !m_SuperFast;
+                m_SuperFast = !m_SuperFast;
                 break;
             }
         }
@@ -175,11 +171,7 @@ void Application::InitializeImGui()
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 
-    float xscale, yscale;
-    glfwGetWindowContentScale(m_Window, &xscale, &yscale);
-
-    float fontSize = 16.0f * xscale;  // Base size 16, scaled by DPI
-    io.Fonts->AddFontFromFileTTF("resources/fonts/ComicSans.ttf", fontSize);
+    io.Fonts->AddFontFromFileTTF("resources/fonts/ComicSans.ttf", 16.0);
 
     ImGui::StyleColorsDark();
 
@@ -201,13 +193,12 @@ void Application::Initialize()
     m_World.SetRenderer(&m_Renderer);
     m_World.Initialize(glm::ivec2(m_Camera3D.GetPosition().x, m_Camera3D.GetPosition().z));
 
-    glEnable(GL_BLEND);
     glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
     glCullFace(GL_BACK);
     glFrontFace(GL_CW);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDepthFunc(GL_LESS);
+
+    glEnable(GL_DEPTH_TEST);
+
     glfwSwapInterval(1);
 }
 
@@ -226,9 +217,6 @@ void Application::Destroy()
 
 void Application::Render()
 {
-    // blue sky
-    glClearColor(190 / 255.0f, 244 / 255.0f, 255 / 255.0f, 1.0f);
-    // glClearColor(0.0f, 0.0f, 0.0f, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_Renderer.Render(m_World, m_Camera3D);
@@ -287,6 +275,21 @@ void Application::RenderImGui()
     ImGui::Text("Press 'F' to toggle super fast");
     ImGui::Text("Position: %.3f %.3f %.3f", m_Camera3D.GetPosition().x, m_Camera3D.GetPosition().y, m_Camera3D.GetPosition().z);
 
+    static const char *skyTypes[] = { "blue", "brown", "gray", "yellow", "cool" };
+    static int skyTypeIndex = 4;  // default cool because i like it the most
+
+    if (ImGui::Combo("Sky Type", &skyTypeIndex, "blue\0brown\0gray\0yellow\0cool"))
+    {
+        if (skyTypeIndex == 4)
+        {
+            m_Renderer.InitializeSkyBoxTextureCool();
+        }
+        else
+        {
+            m_Renderer.InitializeSkyBoxTexture(skyTypes[skyTypeIndex]);
+        }
+    }
+
     // i love unsafe-ness
     if (ImGui::Combo("Block chosen", (int *) &m_BlockTypeChosen, BlockTypeToStringSeparatedByZeros()))
     {
@@ -301,6 +304,8 @@ void Application::RenderImGui()
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / m_FPS, m_FPS);
     ImGui::Text("Chunk size: %zu", m_World.GetChunks().size());
     ImGui::InputInt("Render Distance", m_World.GetRenderDistancePointer());
+    ImGui::InputFloat("Ambient", m_Renderer.GetAmbientPointer());
+    ImGui::InputFloat3("Light Source Direction", (float *) m_Renderer.GetLightSourceDirectionPointer());
     ImGui::Checkbox("Go very fast", &m_SuperFast);
     ImGui::InputFloat3("Teleport", positions);
 

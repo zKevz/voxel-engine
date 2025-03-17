@@ -4,16 +4,18 @@
 
 #include <FastNoiseLite/FastNoiseLite.h>
 
-#include <array>
-
 static constexpr int kChunkDepth = 16;
 static constexpr int kChunkWidth = 16;
-static constexpr int kChunkHeight = 256;
+static constexpr int kChunkHeight = 384;  // 256;
 
 class Chunk
 {
 public:
+    Chunk();
+
     void Initialize(const FastNoiseLite &noise, glm::ivec2 position);
+    void InitializeSkyLight();
+    void InitializeBlockLight();
 
     inline constexpr glm::ivec2 GetPosition() const
     {
@@ -22,12 +24,18 @@ public:
 
     inline constexpr Block &GetBlock(int x, int y, int z)
     {
+        assert(x >= 0 && x < kChunkWidth);
+        assert(y >= 0 && y < kChunkWidth);
+        assert(z >= 0 && z < kChunkWidth);
         return m_Blocks[x][y][z];
     }
 
     inline constexpr BlockType GetBlockType(int x, int y, int z) const
     {
-        return m_Blocks[x][y][z].Type;
+        assert(x >= 0 && x < kChunkWidth);
+        assert(y >= 0 && y < kChunkWidth);
+        assert(z >= 0 && z < kChunkWidth);
+        return m_Blocks[x][y][z].GetType();
     }
 
     inline constexpr GLuint GetVertexArrayObjectID() const
@@ -40,10 +48,16 @@ public:
         m_VertexArrayObjectID = id;
     }
 
+    static bool IsTransparent(int x, int y, int z, const FastNoiseLite &noise);
     static BlockType GetBlockTypeAt(int x, int y, int z, const FastNoiseLite &noise);
 
 private:
+    void AddFeatures(const FastNoiseLite &noise);
+    void PlaceTree(int x, int y, int z);
+
     GLuint m_VertexArrayObjectID;
     glm::ivec2 m_Position;
-    std::array<std::array<std::array<Block, kChunkDepth>, kChunkHeight>, kChunkWidth> m_Blocks;
+
+    std::vector<std::vector<std::vector<Block>>> m_Blocks;
+    // std::array<std::array<std::array<Block, kChunkDepth>, kChunkHeight>, kChunkWidth> m_Blocks;
 };

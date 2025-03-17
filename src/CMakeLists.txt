@@ -7,6 +7,7 @@ add_executable(${PROJECT_NAME}
     Block.cc
     BlockSpecification.cc
     Chunk.cc
+    Light.cc
     Renderer.cc
     ThreadPool.cc
     World.cc
@@ -15,6 +16,7 @@ add_executable(${PROJECT_NAME}
     OpenGL/IndexBuffer.cc
     OpenGL/Shader.cc
     OpenGL/Texture.cc
+    OpenGL/TextureCubeMap.cc
     OpenGL/VertexArrayObject.cc
     OpenGL/VertexBufferObject.cc
 

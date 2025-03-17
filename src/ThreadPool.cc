@@ -64,7 +64,7 @@ void ThreadPool::SubmitChunkAndRender(Renderer *renderer, FastNoiseLite noise, i
             throw std::runtime_error("Cannot enqueue on stopped ThreadPool");
         }
 
-        m_Tasks.emplace([renderer, noise, chunkX, chunkZ]() {
+        m_Tasks.emplace([renderer, noise, chunkX, chunkZ]() mutable {
             Chunk chunk;
             chunk.Initialize(noise, glm::ivec2(chunkX, chunkZ));
 

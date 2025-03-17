@@ -1,6 +1,7 @@
 #include "VertexArrayObject.hh"
 
 #include "Vertex/CrossHairVertex.hh"
+#include "Vertex/SkyBoxVertex.hh"
 #include "Vertex/VoxelVertex.hh"
 
 template<class T>
@@ -40,9 +41,18 @@ void VertexArrayObject<T>::Set(VertexBufferObject<T> vertexBufferObject, std::ve
 {
     Bind();
     m_IndexBuffer.Initialize(indices);
-    vertexBufferObject.Build();
+    m_VertexBufferObject = vertexBufferObject;
+    m_VertexBufferObject.Build();
     Unbind();
 }
 
+template<class T>
+
+void VertexArrayObject<T>::SetVertexBufferObject(VertexBufferObject<T> vertexBufferObject)
+{
+    m_VertexBufferObject = vertexBufferObject;
+}
+
 template class VertexArrayObject<VoxelVertex>;
+template class VertexArrayObject<SkyBoxVertex>;
 template class VertexArrayObject<CrossHairVertex>;

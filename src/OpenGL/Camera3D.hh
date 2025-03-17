@@ -16,7 +16,7 @@ enum class CameraMovement
 
 static constexpr float kDefaultYaw = -90.0f;
 static constexpr float kDefaultPitch = 0.0f;
-static constexpr float kDefaultSpeed = 25.f;
+static constexpr float kDefaultSpeed = 10.f;
 static constexpr float kDefaultSensitivity = 0.1f;
 static constexpr float kDefaultZoom = 45.0f;
 static constexpr float kGravity = 9.8f;
@@ -63,7 +63,6 @@ public:
     }
 
 private:
-    // camera attributes
     glm::vec3 m_Position;
     glm::vec3 m_Front;
     glm::vec3 m_Up;
@@ -71,14 +70,11 @@ private:
     glm::vec3 m_WorldUp;
     glm::vec3 m_Velocity;
 
-    // euler Angles
     float m_Yaw;
+    float m_Zoom;
     float m_Pitch;
-
-    // camera options
     float m_MovementSpeed;
     float m_MouseSensitivity;
-    float m_Zoom;
 
     bool m_InGround = false;
     bool m_EnablePhysics = true;

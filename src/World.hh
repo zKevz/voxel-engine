@@ -2,12 +2,11 @@
 
 #include "Chunk.hh"
 
-#include <future>
 #include <map>
 #include <queue>
 #include <set>
 
-static constexpr int kDefaultRenderDistance = 18;
+static constexpr int kDefaultRenderDistance = 16;
 
 using Chunks = std::map<std::pair<int, int>, Chunk>;
 
@@ -18,9 +17,9 @@ public:
     World();
 
     void AddChunk(glm::ivec2 position);
-    void AddChunk(Chunk chunk);
+    void AddChunk(Chunk &&chunk);
     void Initialize(glm::ivec2 genesis = glm::ivec2(0, 0));
-    void RemoveFuture(glm::ivec2 position);
+    void RemoveQueue(glm::ivec2 position);
 
     void AddBlock(glm::ivec3 position, BlockType type);
     void DestroyBlock(glm::ivec3 position);
@@ -30,6 +29,9 @@ public:
 
     Block &GetBlock(glm::ivec3 position);
     Block &GetBlock(int x, int y, int z);
+
+    bool IsBlockTransparent(glm::ivec3 position);
+    bool IsBlockTransparent(int x, int y, int z);
 
     BlockType GetBlockType(glm::ivec3 position);
     BlockType GetBlockType(int x, int y, int z);
@@ -77,5 +79,4 @@ private:
 
     std::set<std::pair<int, int>> m_QueuedChunks;
     std::queue<std::pair<int, int>> m_RenderQueue;
-    std::map<std::pair<int, int>, std::future<void>> m_Futures;
 };

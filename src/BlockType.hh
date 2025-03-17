@@ -10,10 +10,15 @@ enum class BlockType : unsigned char
     Dirt,
     Stone,
     Bedrock,
-    Sand
+    Sand,
+    Snow,
+    Water,
+    Glass,
+    OakLog,
+    OakLeaves
 };
 
-constexpr std::array<const char *, 6> kBlocksEnumName = { "Air", "Grass", "Dirt", "Stone", "Bedrock", "Sand" };
+static inline std::vector<const char *> kBlocksEnumName = { "Air", "Grass", "Dirt", "Stone", "Bedrock", "Sand", "Snow", "Water", "Glass" };
 
 static inline const char *BlockTypeToStringSeparatedByZeros()
 {

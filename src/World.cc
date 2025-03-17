@@ -1,5 +1,6 @@
 #include "World.hh"
 
+#include "BlockSpecification.hh"
 #include "Renderer.hh"
 #include "ThreadPool.hh"
 #include "Utils/Logger.hh"
@@ -7,22 +8,11 @@
 
 World::World()
 {
-    m_Noise.SetSeed(m_Seed);
+    m_Noise.SetSeed(1337);
     m_Noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
     m_Noise.SetFractalType(FastNoiseLite::FractalType_FBm);
-    m_Noise.SetFrequency(0.1f);
-    m_Noise.SetFractalLacunarity(2.0f);
-    m_Noise.SetFractalGain(0.5f);
-}
-
-static void AddChunkAndRender(Renderer *renderer, FastNoiseLite noise, int chunkX, int chunkZ)
-{
-    Chunk chunk;
-    chunk.Initialize(noise, glm::ivec2(chunkX, chunkZ));
-
-    LogDebug("Adding chunk: ({},{})", chunkX, chunkZ);
-
-    renderer->RenderChunk(noise, std::move(chunk));
+    m_Noise.SetFrequency(0.002);
+    m_Noise.SetFractalOctaves(8);
 }
 
 void World::AddChunk(glm::ivec2 position)
@@ -36,20 +26,14 @@ void World::AddChunk(glm::ivec2 position)
         return;
     }
 
-    auto noise = m_Noise;
-    auto renderer = m_Renderer;
-
     GetThreadPool()->SubmitChunkAndRender(m_Renderer, m_Noise, chunkX, chunkZ);
-
     m_QueuedChunks.insert(key);
-    // auto future = std::async(AddChunkAndRender, m_Renderer, m_Noise, chunkX, chunkZ);
-    // m_Futures.insert_or_assign(key, std::move(future));
 }
 
-void World::AddChunk(Chunk chunk)
+void World::AddChunk(Chunk &&chunk)
 {
     auto key = std::make_pair(chunk.GetPosition().x, chunk.GetPosition().y);
-    m_Chunks.insert({ key, chunk });
+    m_Chunks.insert({ key, std::move(chunk) });
 }
 
 void World::Initialize(glm::ivec2 genesis)
@@ -76,19 +60,19 @@ void World::Initialize(glm::ivec2 genesis)
 
 void World::RemoveFarChunks(glm::ivec2 genesis)
 {
+    // removee all is out of range of render distance
+
     glm::ivec2 genesisPos;
     genesisPos.x = Utils::FloorDiv(genesis.x, kChunkWidth) * kChunkWidth;
     genesisPos.y = Utils::FloorDiv(genesis.y, kChunkDepth) * kChunkDepth;
 
-    // remove all is out of range of render distance
     std::vector<std::pair<int, int>> toRemove;
     for (const auto &[pos, _] : m_Chunks)
     {
         glm::ivec2 chunkPos = glm::ivec2(pos.first, pos.second);
         glm::ivec2 distance = glm::ivec2(std::abs(chunkPos.x - genesisPos.x), std::abs(chunkPos.y - genesisPos.y));
 
-        int renderDistance = (m_RenderDistance) *kChunkWidth;
-        if (distance.x > renderDistance || distance.y > renderDistance)
+        if (distance.x > m_RenderDistance * kChunkWidth || distance.y > m_RenderDistance * kChunkDepth)
         {
             toRemove.push_back(pos);
         }
@@ -98,16 +82,13 @@ void World::RemoveFarChunks(glm::ivec2 genesis)
     {
         LogDebug("Removing chunk {} {}", pair.first, pair.second);
         m_Renderer->DestroyChunk(m_Chunks[pair].GetVertexArrayObjectID());
-
         m_Chunks.erase(pair);
     }
 }
 
-void World::RemoveFuture(glm::ivec2 position)
+void World::RemoveQueue(glm::ivec2 position)
 {
-    auto key = std::make_pair(position.x, position.y);
-    m_Futures.erase(key);
-    m_QueuedChunks.erase(key);
+    m_QueuedChunks.erase(std::make_pair(position.x, position.y));
 }
 
 void World::AddBlock(glm::ivec3 position, BlockType type)
@@ -117,7 +98,7 @@ void World::AddBlock(glm::ivec3 position, BlockType type)
 
     auto key = std::make_pair(chunkX, chunkZ);
     Block &block = GetBlock(position);
-    block.Type = type;
+    block.SetType(type);
 
     m_Renderer->ReRenderChunk(*this, m_Chunks[key], m_Noise);
 }
@@ -129,11 +110,11 @@ void World::DestroyBlock(glm::ivec3 position)
 
     auto key = std::make_pair(chunkX, chunkZ);
     Block &block = GetBlock(position);
-    block.Type = BlockType::Air;
+    block.SetType(BlockType::Air);
 
     m_Renderer->ReRenderChunk(*this, m_Chunks[key], m_Noise);
 
-    // in the edge? also need to re-render chunk besides it
+    // is this special block in the edge!??!?!? also need to re-render chunk besides it
     if (position.x == chunkX)
     {
         key.first -= kChunkWidth;
@@ -182,6 +163,7 @@ Chunk *World::GetChunk(int x, int y, int z)
 Block &World::GetBlock(glm::ivec3 position)
 {
     Chunk *chunk = GetChunk(position);
+    assert(chunk);
 
     int localX = position.x % kChunkWidth;
     int localY = position.y;
@@ -228,10 +210,20 @@ BlockType World::GetBlockType(glm::ivec3 position)
         localZ += kChunkDepth;
     }
 
-    return chunk->GetBlock(localX, localY, localZ).Type;
+    return chunk->GetBlock(localX, localY, localZ).GetType();
 }
 
 BlockType World::GetBlockType(int x, int y, int z)
 {
     return GetBlockType(glm::ivec3(x, y, z));
+}
+
+bool World::IsBlockTransparent(glm::ivec3 position)
+{
+    return GetBlockSpecificationManager()->GetSpecification(GetBlockType(position)).IsTransparent();
+}
+
+bool World::IsBlockTransparent(int x, int y, int z)
+{
+    return IsBlockTransparent(glm::ivec3(x, y, z));
 }

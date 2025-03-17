@@ -9,7 +9,7 @@ void IndexBuffer::Set(std::vector<GLuint> indices)
     m_Count = indices.size();
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_Count * sizeof(GLuint), indices.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_Count * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
 }
 
 void IndexBuffer::Replace(std::vector<GLuint> indices)

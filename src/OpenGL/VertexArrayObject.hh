@@ -14,6 +14,7 @@ public:
     void DestroyInner() const;
 
     void Set(VertexBufferObject<T> vertexBufferObject, std::vector<GLuint> indices);
+    void SetVertexBufferObject(VertexBufferObject<T> vertexBufferObject);
 
     inline constexpr GLuint GetID() const
     {
@@ -22,7 +23,12 @@ public:
 
     inline constexpr GLuint GetIndicesCount() const
     {
-        return m_IndexBuffer.GetCount();
+        if (m_IndexBuffer.GetCount())
+        {
+            return m_IndexBuffer.GetCount();
+        }
+
+        return m_VertexBufferObject.GetCount();
     }
 
     inline constexpr IndexBuffer &GetIndexBuffer()

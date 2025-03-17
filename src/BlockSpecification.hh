@@ -14,6 +14,8 @@ struct BlockSpecification
     void SetAll(glm::uvec2 position);
     void SetPosition(VoxelVertexDirection direction, glm::uvec2 position);
 
+    bool IsTransparent() const;
+
     inline constexpr glm::uvec2 GetPosition(VoxelVertexDirection direction) const
     {
         return Positions[(int) direction];

@@ -50,6 +50,11 @@ public:
     void Unbind() const;
     void Destroy() const;
 
+    inline constexpr GLuint GetCount() const
+    {
+        return m_Vertex.size();
+    }
+
 private:
     GLuint m_ID = 0;
 

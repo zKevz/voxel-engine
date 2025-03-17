@@ -33,7 +33,7 @@ void Camera3D::ProcessKeyboard(CameraMovement direction, float deltaTime, bool s
     float velocity = m_MovementSpeed * deltaTime;
     if (superFast)
     {
-        velocity *= 200;
+        velocity *= 20;
     }
 
     switch (direction)

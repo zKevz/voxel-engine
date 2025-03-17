@@ -2,6 +2,7 @@
 
 #include "Chunk.hh"
 #include "Vertex/CrossHairVertex.hh"
+#include "Vertex/SkyBoxVertex.hh"
 #include "Vertex/VoxelVertex.hh"
 
 template<class T>
@@ -62,7 +63,7 @@ template<class T>
 void VertexBufferObject<T>::Build() const
 {
     Bind();
-    glBufferData(GL_ARRAY_BUFFER, m_Vertex.size() * sizeof(T), m_Vertex.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m_Vertex.size() * sizeof(T), m_Vertex.data(), GL_STATIC_DRAW);
 
     GLuint offset = 0;
 
@@ -94,4 +95,5 @@ void VertexBufferObject<T>::ClearVertex()
 }
 
 template class VertexBufferObject<VoxelVertex>;
+template class VertexBufferObject<SkyBoxVertex>;
 template class VertexBufferObject<CrossHairVertex>;
