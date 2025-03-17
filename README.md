@@ -18,9 +18,6 @@ This project is a lightweight voxel engine built without relying on third-party 
 - **Custom Sky Box**: Multiple sky texture options
 - **Physics & Camera Controls**: First-person camera with movement physics
 - **Interactive GUI**: Real-time parameter adjustment with ImGui
-
-## Technical Achievements
-
 - **Multi-threaded Chunk Processing**: Utilizes a thread pool for background chunk generation
 - **Optimized Mesh Generation**: Only visible faces are rendered, reducing vertex count by 99.54%
 - **Efficient Memory Management**: Compact data structures for blocks and lighting
@@ -28,14 +25,14 @@ This project is a lightweight voxel engine built without relying on third-party 
 - **BitPacking for Vertex Data**: Optimized vertex format to reduce memory usage
 - **Ray Casting**: Precise block selection algorithm
 - **High Performance Rendering**: Able to handle large view distances
-- **Cross-platform Compatibility**: Works on Windows, macOS, and Linux
+- **Performance Stability**: Stable 120 FPS, even with 32 chunks render distance
 
 ## Screenshots
 ![Snowy Mountain](resources/screenshots/world_view1.png)
 *Cool snowy mountains*
 
 ![ImGUI](resources/screenshots/world_view3.png)
-*Toggleable GUI to modify many things*
+*Toggleable GUI to modify many things in-game*
 
 ![Golden Hour Mountain](resources/screenshots/world_view4.png)
 *Cool mountain with golden hour sky box*
@@ -53,6 +50,7 @@ This project is a lightweight voxel engine built without relying on third-party 
 - C++20 compatible compiler
 - CMake 3.8 or higher
 - OpenGL 3.3+ support
+- Clang 14 (I use this to compile the project, other compilers might work, or might not, though MSVC will probably not work because i dont add support for struct padding `#pragma push(pack, 1)` )
 
 ### Required Libraries
 
