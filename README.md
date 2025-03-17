@@ -94,7 +94,6 @@ cmake --build .
 - **Mouse**: Look around
 - **Left Click**: Break blocks
 - **Right Click**: Place blocks
-- **Scroll Wheel**: Change selected block type
 - **ESC**: Toggle cursor
 - **F**: Toggle super fast crazy movement speed
 - **R**: Toggle wireframe rendering
