@@ -152,8 +152,8 @@ void Renderer::RenderChunk(FastNoiseLite noise, Chunk &&chunk)
 
     std::vector<GLuint> voxelIndices;
     std::vector<GLuint> waterIndices;
-    voxelIndices.reserve(kChunkWidth * kChunkHeight * kChunkDepth * 24);
-    waterIndices.reserve(kChunkWidth * kChunkHeight * kChunkDepth * 24);
+    voxelIndices.reserve(kChunkWidth * kChunkHeight * kChunkDepth * sizeof(GLuint));
+    waterIndices.reserve(kChunkWidth * kChunkHeight * kChunkDepth * sizeof(GLuint));
 
     GLuint voxelIndex = 0;
     GLuint waterIndex = 0;
@@ -200,7 +200,7 @@ void Renderer::ReRenderChunk(World &world, Chunk &chunk, FastNoiseLite &noise)
     LogDebug("re-rendering chunk ({},{})", chunk.GetPosition().x, chunk.GetPosition().y);
 
     std::vector<GLuint> indices;
-    indices.reserve(kChunkWidth * kChunkHeight * kChunkDepth * 24);
+    indices.reserve(kChunkWidth * kChunkHeight * kChunkDepth * sizeof(GLuint));
 
     chunk.InitializeSkyLight();
     chunk.InitializeBlockLight();
@@ -242,7 +242,7 @@ void Renderer::ReRenderChunk(World &world, Chunk &chunk, FastNoiseLite &noise)
 
     index = 0;
     indices = {};
-    indices.reserve(kChunkWidth * kChunkHeight * kChunkDepth * 24);
+    indices.reserve(kChunkWidth * kChunkHeight * kChunkDepth * sizeof(GLuint));
     vertexBufferObject = {};
     vertexBufferObject.Initialize();
     vertexBufferObject.AddFloat(3);

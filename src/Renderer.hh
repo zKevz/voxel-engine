@@ -94,7 +94,7 @@ private:
     Texture m_VoxelTexture;
     TextureCubeMap m_SkyBoxTexture;
 
-    std::shared_mutex m_QueueMutex;
+    mutable std::shared_mutex m_QueueMutex;
     std::vector<RenderQueue> m_Queue;
 
     std::vector<VertexArrayObject<VoxelVertex>> m_VoxelVertexArrayObjects;
