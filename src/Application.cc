@@ -321,7 +321,8 @@ void Application::RenderImGui()
     ImGui::Separator();
 
     ImGui::Checkbox("Go very fast", m_Camera3D.GetSuperFastPointer());
-    ImGui::Checkbox("Enable physics", m_Camera3D.GetPhysicsEnabledPointer());
+    // TODO: not impl yet..
+    // ImGui::Checkbox("Enable physics", m_Camera3D.GetPhysicsEnabledPointer());
     ImGui::Separator();
 
     ImGui::InputFloat3("Teleport", positions);

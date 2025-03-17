@@ -35,83 +35,38 @@ void Camera3D::Update(GLFWwindow *window, float deltaTime)
 
     if (glfwGetInputMode(window, GLFW_CURSOR) != GLFW_CURSOR_NORMAL)
     {
-        CameraMovement direction = CameraMovement::None;
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         {
-            direction = CameraMovement::Forward;
+            m_Velocity.x = m_Front.x;
+            m_Velocity.z = m_Front.z;
         }
 
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         {
-            direction = CameraMovement::Backward;
+            m_Velocity.x = -m_Front.x;
+            m_Velocity.z = -m_Front.z;
         }
 
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
         {
-            direction = CameraMovement::Left;
+            m_Velocity.x = -m_Right.x;
+            m_Velocity.z = -m_Right.z;
         }
 
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         {
-            direction = CameraMovement::Right;
+            m_Velocity.x = m_Right.x;
+            m_Velocity.z = m_Right.z;
         }
 
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
         {
-            direction = CameraMovement::Up;
+            m_Velocity.y = 1.0f;
         }
 
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         {
-            direction = CameraMovement::Down;
-        }
-
-        switch (direction)
-        {
-            case CameraMovement::Forward:
-            {
-                m_Velocity.x = m_Front.x;
-                m_Velocity.z = m_Front.z;
-                break;
-            }
-
-            case CameraMovement::Backward:
-            {
-                m_Velocity.x = -m_Front.x;
-                m_Velocity.z = -m_Front.z;
-                break;
-            }
-
-            case CameraMovement::Left:
-            {
-                m_Velocity.x = -m_Right.x;
-                m_Velocity.z = -m_Right.z;
-                break;
-            }
-
-            case CameraMovement::Right:
-            {
-                m_Velocity.x = m_Right.x;
-                m_Velocity.z = m_Right.z;
-                break;
-            }
-
-            case CameraMovement::Up:
-            {
-                m_Velocity.y = 1.0f;
-                break;
-            }
-
-            case CameraMovement::Down:
-            {
-                m_Velocity.y = -1.0f;
-                break;
-            }
-
-            default:
-            {
-                break;
-            }
+            m_Velocity.y = -1.0f;
         }
 
         if (m_SuperFast)

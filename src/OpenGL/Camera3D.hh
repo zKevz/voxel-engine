@@ -7,17 +7,6 @@
 //
 #include <GLFW/glfw3.h>
 
-enum class CameraMovement
-{
-    None,
-    Forward,
-    Backward,
-    Left,
-    Right,
-    Up,
-    Down
-};
-
 static constexpr float kDefaultYaw = -90.0f;
 static constexpr float kDefaultPitch = 0.0f;
 static constexpr float kDefaultSpeed = 10.f;
