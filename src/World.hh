@@ -27,8 +27,8 @@ public:
     Chunk *GetChunk(glm::ivec3 position);
     Chunk *GetChunk(int x, int y, int z);
 
-    Block &GetBlock(glm::ivec3 position);
-    Block &GetBlock(int x, int y, int z);
+    Block *GetBlock(glm::ivec3 position);
+    Block *GetBlock(int x, int y, int z);
 
     bool IsBlockTransparent(glm::ivec3 position);
     bool IsBlockTransparent(int x, int y, int z);

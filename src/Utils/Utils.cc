@@ -27,7 +27,13 @@ RaycastBlockResult Utils::RaycastBlock(glm::vec3 origin, glm::vec3 direction, Wo
         glm::vec3 pos = rayOrigin + rayDir * t;
         glm::ivec3 blockPos = glm::floor(pos);
 
-        if (world.GetBlockType(blockPos.x, blockPos.y, blockPos.z) != BlockType::Air && world.GetBlockType(blockPos.x, blockPos.y, blockPos.z) != BlockType::Water)
+        Block *block = world.GetBlock(blockPos.x, blockPos.y, blockPos.z);
+        if (!block)
+        {
+            continue;
+        }
+
+        if (block->GetType() != BlockType::Air && block->GetType() != BlockType::Water)
         {
             glm::vec3 prevPos = rayOrigin + rayDir * (t - stepSize);
             glm::ivec3 prevBlockPos = glm::floor(prevPos);

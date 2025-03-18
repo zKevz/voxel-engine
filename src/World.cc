@@ -97,9 +97,13 @@ void World::AddBlock(glm::ivec3 position, BlockType type)
     int chunkZ = Utils::FloorDiv(position.z, kChunkDepth) * kChunkDepth;
 
     auto key = std::make_pair(chunkX, chunkZ);
-    Block &block = GetBlock(position);
-    block.SetType(type);
+    Block *block = GetBlock(position);
+    if (!block)
+    {
+        return;
+    }
 
+    block->SetType(type);
     m_Renderer->ReRenderChunk(*this, m_Chunks[key], m_Noise);
 }
 
@@ -109,9 +113,13 @@ void World::DestroyBlock(glm::ivec3 position)
     int chunkZ = Utils::FloorDiv(position.z, kChunkDepth) * kChunkDepth;
 
     auto key = std::make_pair(chunkX, chunkZ);
-    Block &block = GetBlock(position);
-    block.SetType(BlockType::Air);
+    Block *block = GetBlock(position);
+    if (!block)
+    {
+        return;
+    }
 
+    block->SetType(BlockType::Air);
     m_Renderer->ReRenderChunk(*this, m_Chunks[key], m_Noise);
 
     // is this special block in the edge!??!?!? also need to re-render chunk besides it
@@ -160,10 +168,13 @@ Chunk *World::GetChunk(int x, int y, int z)
     return GetChunk(glm::ivec3(x, y, z));
 }
 
-Block &World::GetBlock(glm::ivec3 position)
+Block *World::GetBlock(glm::ivec3 position)
 {
     Chunk *chunk = GetChunk(position);
-    assert(chunk);
+    if (!chunk)
+    {
+        return nullptr;
+    }
 
     int localX = position.x % kChunkWidth;
     int localY = position.y;
@@ -179,10 +190,10 @@ Block &World::GetBlock(glm::ivec3 position)
         localZ += kChunkDepth;
     }
 
-    return chunk->GetBlock(localX, localY, localZ);
+    return chunk->GetBlockSafe(localX, localY, localZ);
 }
 
-Block &World::GetBlock(int x, int y, int z)
+Block *World::GetBlock(int x, int y, int z)
 {
     return GetBlock(glm::ivec3(x, y, z));
 }

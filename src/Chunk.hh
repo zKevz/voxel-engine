@@ -25,16 +25,26 @@ public:
     inline constexpr Block &GetBlock(int x, int y, int z)
     {
         assert(x >= 0 && x < kChunkWidth);
-        assert(y >= 0 && y < kChunkWidth);
-        assert(z >= 0 && z < kChunkWidth);
+        assert(y >= 0 && y < kChunkHeight);
+        assert(z >= 0 && z < kChunkDepth);
         return m_Blocks[x][y][z];
+    }
+
+    inline constexpr Block *GetBlockSafe(int x, int y, int z)
+    {
+        if (x < 0 || x > kChunkWidth || y < 0 || y > kChunkHeight || z < 0 || z > kChunkDepth)
+        {
+            return nullptr;
+        }
+
+        return &m_Blocks[x][y][z];
     }
 
     inline constexpr BlockType GetBlockType(int x, int y, int z) const
     {
         assert(x >= 0 && x < kChunkWidth);
-        assert(y >= 0 && y < kChunkWidth);
-        assert(z >= 0 && z < kChunkWidth);
+        assert(y >= 0 && y < kChunkHeight);
+        assert(z >= 0 && z < kChunkDepth);
         return m_Blocks[x][y][z].GetType();
     }
 
