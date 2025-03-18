@@ -14,7 +14,6 @@ This project is a lightweight voxel engine built without relying on third-party 
 - **Block-Based World**: Place and destroy different types of blocks
 - **Dynamic Lighting System**: Sky light and block light propagation
 - **Chunk-Based Rendering**: Efficient chunk loading and unloading
-- **Water Rendering**: Special transparent block handling with alpha blending
 - **Custom Sky Box**: Multiple sky texture options
 - **Physics & Camera Controls**: First-person camera with movement physics
 - **Interactive GUI**: Real-time parameter adjustment with ImGui
