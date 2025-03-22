@@ -57,6 +57,11 @@ void main()
         {
             u_TextureColor = vec4(0.7, 0.7, 0.7, 1.0);
         }
+
+        if (direction == 0u || direction == 1u)
+        {
+            u_TextureColor = vec4(0.9, 0.9, 0.9, 1.0);
+        }
     }
 
     u_Normal = normals[direction];
@@ -71,8 +76,6 @@ void main()
 
         gl_Position.y += sin(gl_Position.x * freq + timeSpeed) * crazyFactor;
         gl_Position.y += cos(gl_Position.z * freq + timeSpeed) * crazyFactor;
-
-        u_TextureColor.a = 0.5;
     }
 
     if (u_Raycast.w == 1 && a_BlockPos.x == u_Raycast.x && a_BlockPos.y == u_Raycast.y && a_BlockPos.z == u_Raycast.z)

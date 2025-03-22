@@ -362,21 +362,22 @@ void Renderer::RenderWorld(World &world, const Camera3D &camera)
     RaycastBlockResult raycastBlockResult = Utils::RaycastBlock(camera.GetPosition(), camera.GetFront(), world);
     m_VoxelShader.SetUniform("u_Raycast", glm::vec4((float) raycastBlockResult.BlockPosition.x, (float) raycastBlockResult.BlockPosition.y, (float) raycastBlockResult.BlockPosition.z, (float) raycastBlockResult.Hit));
 
-    for (int i = 0; i < m_VoxelVertexArrayObjects.size(); ++i)
+    for (const VertexArrayObject<VoxelVertex> &voxelVertexArrayObject : m_VoxelVertexArrayObjects)
     {
-        const VertexArrayObject<VoxelVertex> &voxelVertexArrayObject = m_VoxelVertexArrayObjects[i];
-        const VertexArrayObject<VoxelVertex> &waterVertexArrayObject = m_WaterVertexArrayObjects[i];
-
         voxelVertexArrayObject.Bind();
-
-        glDisable(GL_BLEND);
         glDrawElements(GL_TRIANGLES, voxelVertexArrayObject.GetIndicesCount(), GL_UNSIGNED_INT, 0);
+    }
 
+    glEnable(GL_BLEND);
+
+    for (const VertexArrayObject<VoxelVertex> &waterVertexArrayObject : m_WaterVertexArrayObjects)
+    {
         waterVertexArrayObject.Bind();
 
-        glEnable(GL_BLEND);
         glDrawElements(GL_TRIANGLES, waterVertexArrayObject.GetIndicesCount(), GL_UNSIGNED_INT, 0);
     }
+
+    glDisable(GL_BLEND);
 }
 
 void Renderer::InitializeSkyBox()
