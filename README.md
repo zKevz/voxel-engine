@@ -28,20 +28,20 @@ This project is a lightweight voxel engine built without relying on third-party 
 - **Performance Stability**: Stable 120 FPS, even with 32 chunks render distance
 
 ## Screenshots
-![Snowy Mountain](resources/screenshots/world_view1.png)
+![Snowy Mountain](resources/screenshots/world_view7.png)
 *Cool snowy mountains*
 
 ![ImGUI](resources/screenshots/world_view3.png)
-*Toggleable GUI to modify many things in-game*
+*Toggleable GUI to modify many things in-game* (old screenshot, before water transparency)
 
 ![Golden Hour Mountain](resources/screenshots/world_view4.png)
-*Cool mountain with golden hour sky box*
+*Cool mountain with golden hour sky box* (old screenshot, before water transparency)
 
 ![Blue Sky Mountain](resources/screenshots/world_view5.png)
-*Cool mountain with blue sky box*
+*Cool mountain with blue sky box* (old screenshot, before water transparency)
 
 ![Procedural Generation](resources/screenshots/world_view6.png)
-*Procedurally generated terrain with various block types*
+*Procedurally generated terrain with various block types* (old screenshot, before water transparency)
 
 ## Building the Project
 
